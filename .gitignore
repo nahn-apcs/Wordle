@@ -5,3 +5,9 @@ dist/
 build/
 __pycache__/
 .venv/
+
+/public/build/
+
+package-lock.json
+test.html
+setVersion.mjs
