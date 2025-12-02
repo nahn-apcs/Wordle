@@ -16,3 +16,5 @@ htmlcov/
 package-lock.json
 test.html
 setVersion.mjs
+
+pattern_matrix.npy
