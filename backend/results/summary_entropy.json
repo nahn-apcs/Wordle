@@ -1,0 +1,22 @@
+{
+  "algorithm": "entropy",
+  "total_words": 1000,
+  "wins": 996,
+  "losses": 4,
+  "win_rate": 99.6,
+  "avg_guesses": 4.273,
+  "avg_guesses_won": 4.2620481927710845,
+  "min_guesses": 2,
+  "max_guesses": 6,
+  "total_time_sec": 48.02806054195389,
+  "avg_time_ms": 47.935624904115684,
+  "distribution": {
+    "solved_in_1": 0,
+    "solved_in_2": 1,
+    "solved_in_3": 122,
+    "solved_in_4": 529,
+    "solved_in_5": 303,
+    "solved_in_6": 41,
+    "solved_in_7": 4
+  }
+}

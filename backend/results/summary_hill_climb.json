@@ -1,0 +1,25 @@
+{
+  "algorithm": "hill_climb",
+  "total_words": 14855,
+  "wins": 14627,
+  "losses": 228,
+  "win_rate": 98.46516324469874,
+  "avg_guesses": 4.389835072366207,
+  "avg_guesses_won": 4.346482532303275,
+  "min_guesses": 1,
+  "max_guesses": 6,
+  "total_time_sec": 408.2507297920238,
+  "avg_time_ms": 25.77444064882761,
+  "distribution": {
+    "solved_in_1": 1,
+    "solved_in_2": 33,
+    "solved_in_3": 1725,
+    "solved_in_4": 7120,
+    "solved_in_5": 4634,
+    "solved_in_6": 1114,
+    "solved_in_7": 195,
+    "solved_in_8": 27,
+    "solved_in_9": 6
+  }
+}
+

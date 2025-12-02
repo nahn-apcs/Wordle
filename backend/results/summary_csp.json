@@ -1,0 +1,33 @@
+{
+  "algorithm": "csp",
+  "total_words": 14855,
+  "wins": 10989,
+  "losses": 3866,
+  "win_rate": 73.97509256142712,
+  "avg_guesses": 5.648468529114776,
+  "avg_guesses_won": 4.821912821912822,
+  "min_guesses": 1,
+  "max_guesses": 6,
+  "total_time_sec": 242.90373525000177,
+  "avg_time_ms": 14.593863417970462,
+  "distribution": {
+    "solved_in_1": 1,
+    "solved_in_2": 116,
+    "solved_in_3": 1022,
+    "solved_in_4": 2782,
+    "solved_in_5": 3847,
+    "solved_in_6": 3221,
+    "solved_in_7": 1874,
+    "solved_in_8": 978,
+    "solved_in_9": 528,
+    "solved_in_10": 262,
+    "solved_in_11": 134,
+    "solved_in_12": 59,
+    "solved_in_13": 21,
+    "solved_in_14": 5,
+    "solved_in_15": 2,
+    "solved_in_16": 1,
+    "solved_in_17": 1,
+    "solved_in_18": 1
+  }
+}
