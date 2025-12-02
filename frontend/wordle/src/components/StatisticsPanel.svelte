@@ -24,7 +24,6 @@
 	interface ResultEntry {
 		word: string;
 		time: number;
-		memory: number;
 		guesses: number;
 		ok: boolean;
 	}
@@ -57,14 +56,13 @@
 				// Random simulation result
 				const guesses = Math.floor(Math.random() * 7) + 1;
 				const time = Math.random() * 100 + 10;
-				const memory = Math.random() * 50 + 5;
 				const ok = guesses <= 6;
 
 				const word = `WORD${i + 1}`;
 
 				results = [
 					...results,
-					{ word, time, memory, guesses, ok },
+					{ word, time, guesses, ok },
 				];
 
 				// Update distribution
@@ -93,10 +91,6 @@
 
 	function formatTime(ms: number): string {
 		return ms.toFixed(1) + "ms";
-	}
-
-	function formatMemory(mb: number): string {
-		return mb.toFixed(1) + "MB";
 	}
 
 	$: maxDist = Math.max(...distribution, 1);
@@ -176,7 +170,6 @@
 			<div class="results-header">
 				<span>WORD</span>
 				<span>Time</span>
-				<span>Memory</span>
 				<span>Tries</span>
 				<span>OK</span>
 			</div>
@@ -185,7 +178,6 @@
 					<div class="result-row" class:fail={!r.ok}>
 						<span class="result-word">{r.word}</span>
 						<span>{formatTime(r.time)}</span>
-						<span>{formatMemory(r.memory)}</span>
 						<span>{r.guesses}</span>
 						<span>{r.ok ? "✓" : "✗"}</span>
 					</div>
@@ -502,7 +494,7 @@
 
 	.results-header {
 		display: grid;
-		grid-template-columns: 1.5fr 1fr 1fr 0.7fr 0.4fr;
+		grid-template-columns: 1.5fr 1fr 0.7fr 0.5fr;
 		gap: 4px;
 		padding: 8px 10px;
 		background: var(--color-tone-6, #eee);
@@ -523,7 +515,7 @@
 
 	.result-row {
 		display: grid;
-		grid-template-columns: 1.5fr 1fr 1fr 0.7fr 0.4fr;
+		grid-template-columns: 1.5fr 1fr 0.7fr 0.5fr;
 		gap: 4px;
 		padding: 6px 10px;
 		font-size: 0.68rem;
