@@ -42,13 +42,35 @@
 	export let disabled: boolean = false;
 
 	// Export function for external use (click on candidate word)
-	export function inputAndSubmit(inputWord: string) {
+	export async function inputAndSubmit(inputWord: string) {
 		if (!game.active || disabled) return;
-		// Set the current row to the input word
-		game.board.words[game.guesses] = inputWord.toLowerCase();
-		game = game; // trigger reactivity
-		// Submit after a tiny delay so UI can update
-		setTimeout(() => submitWord(), 50);
+		
+		const word = inputWord.toLowerCase();
+		const LETTER_DELAY = 80; // ms between each letter
+		
+		// Type each letter one by one with smooth animation
+		for (let i = 0; i < word.length; i++) {
+			game.board.words[game.guesses] = word.slice(0, i + 1);
+			game = game; // trigger reactivity
+			await new Promise(r => setTimeout(r, LETTER_DELAY));
+		}
+		
+		// Small pause before submitting
+		await new Promise(r => setTimeout(r, 150));
+		submitWord();
+	}
+
+	// Export for AI mode - trigger win animation
+	export function triggerWin(guessCount: number, message: string) {
+		board.bounce(guessCount - 1);
+		game.active = false;
+		setTimeout(() => toaster.pop(message), DELAY_INCREMENT * COLS);
+	}
+
+	// Export for AI mode - trigger lose animation  
+	export function triggerLose(message: string) {
+		game.active = false;
+		toaster.pop(message);
 	}
 
 	setContext("toaster", toaster);

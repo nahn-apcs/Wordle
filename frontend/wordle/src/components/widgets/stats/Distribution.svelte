@@ -14,15 +14,17 @@
 <div class="container">
 	{#each Object.entries(distribution) as guess, i (guess[0])}
 		{@const g = Number(guess[0])}
+		{@const countStr = String(guess[1])}
+		{@const countMinWidth = Math.max(countStr.length * 12 + 20, 70)}
 		{#if !isNaN(g)}
 			<div class="graph">
 				<span class="guess">{guess[0]}</span>
 				<div
 					class="bar"
 					class:this={g === game.guesses && !game.active && !failed(game)}
-					style="width: {(guess[1] / max) * 100}%;"
+					style="width: {Math.max((guess[1] / max) * 100, 10)}%; min-width: {countMinWidth}px;"
 				>
-					{guess[1]}
+					<span class="count">{countStr}</span>
 				</div>
 			</div>
 		{/if}
@@ -30,35 +32,44 @@
 </div>
 
 <style>
-	.guess {
-		display: grid;
-		place-items: center;
-	}
 	.container {
-		width: 80%;
-		margin-left: auto;
-		margin-right: auto;
+		width: 100%;
+		padding: 0 8px;
+		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
 		gap: 4px;
 	}
 	.graph {
-		height: 20px;
+		height: 22px;
 		display: flex;
+		align-items: center;
 		gap: 4px;
 	}
-	.bar {
-		min-width: 7%;
-		transition: width 0.3s ease-out;
-		background: var(--color-absent);
-		color: white;
+	.guess {
+		width: 14px;
+		text-align: center;
 		font-weight: bold;
+		flex-shrink: 0;
+	}
+	.bar {
+		background: var(--color-absent);
+		border-radius: 4px;
+		height: 100%;
 		display: flex;
-		justify-content: end;
+		justify-content: flex-end;
 		align-items: center;
-		padding-right: min(0.8rem, 1vw);
+		padding: 0 4px;
+		box-sizing: border-box;
+		overflow: hidden;
 	}
 	.bar.this {
 		background: var(--color-correct);
+	}
+	.count {
+		font-weight: 700;
+		font-size: 0.55rem;
+		color: white;
+		white-space: nowrap;
 	}
 </style>

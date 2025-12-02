@@ -4,8 +4,13 @@ node_modules/
 dist/
 build/
 __pycache__/
+*.py[cod]
+*$py.class
 .venv/
 
+.coverage
+htmlcov/
+.pytest_cache/
 /public/build/
 
 package-lock.json

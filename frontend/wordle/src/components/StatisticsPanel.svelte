@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from "svelte";
-
-	// Algorithm options
-	type Algorithm = "csp" | "hill_climb" | "stochastic_hc" | "sa" | "genetic" | "entropy";
+	import { benchmarkStep, generateSessionId, type Algorithm } from "../api";
+	import { words } from "../utils";
 
 	const algorithms: { value: Algorithm; label: string }[] = [
 		{ value: "csp", label: "CSP" },
@@ -15,7 +14,7 @@
 
 	let selectedAlgo: Algorithm = "csp";
 	let wordCount = 200;
-	const maxWords = 14855;
+	const maxWords = words.words.length;
 
 	// Distribution data
 	let distribution = [0, 0, 0, 0, 0, 0, 0]; // 1, 2, 3, 4, 5, 6, >6
@@ -32,61 +31,70 @@
 	// Running state
 	let isRunning = false;
 	let progress = 0;
-	let abortController: AbortController | null = null;
+	let shouldStop = false;
+	let sessionId = generateSessionId();
 
-	// Simulate algorithm run (replace with actual FastAPI call later)
+	// Run algorithm benchmark using FastAPI
 	async function runAlgorithm() {
 		if (isRunning) return;
 
 		isRunning = true;
+		shouldStop = false;
 		progress = 0;
 		results = [];
 		distribution = [0, 0, 0, 0, 0, 0, 0];
-
-		abortController = new AbortController();
+		sessionId = generateSessionId();
 
 		try {
-			// Simulate running through words
-			for (let i = 0; i < wordCount; i++) {
-				if (abortController.signal.aborted) break;
+			// Get test words from dictionary
+			const testWords = words.words.slice(0, wordCount).map(w => w.toUpperCase());
+			
+			for (let i = 0; i < testWords.length; i++) {
+				if (shouldStop) break;
 
-				// Simulate API call delay
-				await new Promise((resolve) => setTimeout(resolve, 50));
+				const targetWord = testWords[i];
+				
+				try {
+					// Call API for benchmark step
+					const result = await benchmarkStep(sessionId, selectedAlgo, targetWord);
+					
+					const ok = result.won;
+					const guesses = result.guesses;
+					
+					results = [
+						...results,
+						{ 
+							word: result.word, 
+							time: result.time_ms, 
+							guesses: guesses, 
+							ok: ok 
+						},
+					];
 
-				// Random simulation result
-				const guesses = Math.floor(Math.random() * 7) + 1;
-				const time = Math.random() * 100 + 10;
-				const ok = guesses <= 6;
-
-				const word = `WORD${i + 1}`;
-
-				results = [
-					...results,
-					{ word, time, guesses, ok },
-				];
-
-				// Update distribution
-				if (guesses <= 6) {
-					distribution[guesses - 1]++;
-				} else {
-					distribution[6]++;
+					// Update distribution
+					if (ok && guesses <= 6) {
+						distribution[guesses - 1]++;
+					} else {
+						distribution[6]++;
+					}
+					distribution = [...distribution];
+				} catch (apiError) {
+					console.error(`API error for word ${targetWord}:`, apiError);
+					// Continue with next word on error
 				}
-				distribution = [...distribution];
 
-				progress = ((i + 1) / wordCount) * 100;
+				progress = ((i + 1) / testWords.length) * 100;
 			}
 		} catch (e) {
 			console.error("Algorithm run error:", e);
 		} finally {
 			isRunning = false;
-			abortController = null;
+			shouldStop = false;
 		}
 	}
 
 	function stopAlgorithm() {
-		if (abortController) {
-			abortController.abort();
-		}
+		shouldStop = true;
 	}
 
 	function formatTime(ms: number): string {
@@ -469,9 +477,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
-		padding-right: 8px;
-		min-width: 28px;
+		padding-right: 4px;
+		min-width: 32px;
 		transition: width 0.4s ease;
+		box-sizing: border-box;
 	}
 
 	.dist-bar-h.fail {
@@ -479,7 +488,7 @@
 	}
 
 	.dist-count {
-		font-size: 0.75rem;
+		font-size: 0.7rem;
 		font-weight: 800;
 		color: #fff;
 	}

@@ -16,6 +16,15 @@
 	import { setContext, tick } from "svelte";
 	import GuessProgressChart from "./components/GuessProgressChart.svelte";
 	import StatisticsPanel from "./components/StatisticsPanel.svelte";
+	import { 
+		predict, 
+		update as updateSolver, 
+		reset as resetSolver, 
+		getCandidates,
+		generateSessionId,
+		stateToFeedback,
+		type Algorithm 
+	} from "./api";
 
 
 
@@ -92,18 +101,14 @@
 		}
 	}
 
-	type Algo =
-		| "csp"
-		| "hill_climb"
-		| "stochastic_hc"
-		| "sa"
-		| "genetic"
-		| "entropy";
+	// Session ID for API calls
+	let sessionId = generateSessionId();
 
-	let aiAlgo: Algo = "csp";
+	let aiAlgo: Algorithm = "csp";
 
 	// AI Agent mode: random-only target word (always valid)
 	let targetWord = "";
+	let isAiRunning = false;
 
 	const validWordSet = new Set(words.words.map((w) => w.toUpperCase()));
 
@@ -113,7 +118,25 @@
 		targetWord = w.toUpperCase();
 	}
 
-	function runWithTargetWord() {
+	// Reset game and solver state
+	async function resetGame() {
+		// Generate new session for fresh solver state
+		sessionId = generateSessionId();
+		
+		// Reset game board
+		state = new GameState($mode, null);
+		letterStates.set(new LetterStates(state.board));
+		
+		// Reset solver on backend
+		try {
+			await resetSolver(sessionId, aiAlgo);
+		} catch (e) {
+			console.error("Failed to reset solver:", e);
+		}
+	}
+
+	// Run AI agent to solve the target word
+	async function runAiAgent() {
 		if (!targetWord) randomTargetWord();
 
 		// Safety: ensure the word exists in our dictionary
@@ -122,12 +145,102 @@
 			randomTargetWord();
 		}
 
+		// Reset game state
 		word = targetWord.toLowerCase();
-		state = new GameState($mode, null); // fresh board
+		state = new GameState($mode, null);
 		letterStates.set(new LetterStates(state.board));
+		
+		// Reset solver
+		sessionId = generateSessionId();
+		try {
+			await resetSolver(sessionId, aiAlgo);
+		} catch (e) {
+			console.error("Failed to reset solver:", e);
+		}
+
+		isAiRunning = true;
+
+		try {
+			const maxGuesses = 6;
+			const LETTER_DELAY = 120; // ms between each letter (slower typing)
+			const REVEAL_DELAY = 600; // ms for flip animation
+			const BETWEEN_WORDS_DELAY = 500; // ms pause between words
+			
+			// AI praise messages (matching game's style)
+			const AI_PRAISE = ["🧠 Genius!", "✨ Magnificent!", "🎯 Impressive!", "💫 Splendid!", "👏 Great!", "😅 Phew!"];
+			
+			let won = false;
+			
+			for (let guessNum = 0; guessNum < maxGuesses; guessNum++) {
+				// Get prediction from AI
+				const prediction = await predict(sessionId, aiAlgo);
+				const guess = prediction.guess.toLowerCase();
+
+				// Type each letter one by one with animation
+				for (let i = 0; i < guess.length; i++) {
+					state.board.words[state.guesses] = guess.slice(0, i + 1);
+					state = state; // trigger reactivity
+					await tick();
+					await new Promise(r => setTimeout(r, LETTER_DELAY));
+				}
+				
+				// Small pause before submitting
+				await new Promise(r => setTimeout(r, 250));
+
+				// Submit the word
+				if (gameComponent) {
+					// Manually process the guess
+					const guessState = state.guess(word);
+					state.board.state[state.guesses] = guessState;
+					++state.guesses;
+					$letterStates.update(guessState, guess);
+					$letterStates = $letterStates;
+					state = state;
+				}
+
+				await tick();
+				
+				// Wait for flip animation to complete
+				await new Promise(r => setTimeout(r, REVEAL_DELAY + guess.length * 120));
+
+				// Check if won
+				if (guess === word) {
+					won = true;
+					
+					// Use game's native win animation with bounce effect
+					if (gameComponent) {
+						gameComponent.triggerWin(guessNum + 1, AI_PRAISE[guessNum] || "🤖 AI Wins!");
+					}
+					
+					console.log(`AI won in ${guessNum + 1} guesses!`);
+					break;
+				}
+
+				// Update solver with feedback
+				const lastState = state.board.state[state.guesses - 1];
+				const feedback = stateToFeedback(lastState);
+				await updateSolver(sessionId, guess.toUpperCase(), feedback);
+				
+				// Longer pause between guesses
+				await new Promise(r => setTimeout(r, BETWEEN_WORDS_DELAY));
+			}
+			
+			// If AI didn't win after all guesses
+			if (!won) {
+				if (gameComponent) {
+					gameComponent.triggerLose(`😢 AI Failed! The word was ${word.toUpperCase()}`);
+				}
+			}
+			
+		} catch (e) {
+			console.error("AI agent error:", e);
+			toaster.pop("❌ Error: Could not connect to AI");
+		} finally {
+			isAiRunning = false;
+		}
 	}
 
-	// Placeholder UI data (plug FastAPI later)
+	// Placeholder UI data - will be updated from API
 	let topCandidates: Array<{ word: string; score: number }> = [
 		{ word: "CRANE", score: 9.2 },
 		{ word: "SLATE", score: 8.8 },
@@ -136,19 +249,31 @@
 		{ word: "ROAST", score: 8.0 },
 	];
 
+	// Fetch candidates from API when game state changes (for human mode hints)
+	async function fetchCandidates() {
+		if (playMode !== "human" || !hintsEnabled) return;
+		
+		try {
+			const response = await getCandidates(sessionId, "csp", 5);
+			topCandidates = response.candidates;
+		} catch (e) {
+			// API not available, keep placeholder data
+			console.debug("Could not fetch candidates:", e);
+		}
+	}
+
 	// Get remaining words from GuessProgressChart (avoid duplicate calculation)
 	let remainingWords = words.words.length;
 	$: entropyBits = remainingWords > 0 ? Math.log2(remainingWords) : 0;
 
-	$: if (playMode === "human") aiAlgo = "best";
+	$: if (playMode === "human") aiAlgo = "csp";
 
-	// Reset game when switching between modes
+	// Reset game and solver when switching between modes
 	let prevPlayMode: PlayMode | null = null;
 	$: {
 		if (prevPlayMode !== null && prevPlayMode !== playMode) {
 			// Only reset when mode actually changes (not on initial mount)
-			state = new GameState($mode, null);
-			letterStates.set(new LetterStates(state.board));
+			resetGame();
 			targetWord = "";
 		}
 		prevPlayMode = playMode;
@@ -238,11 +363,21 @@
 					</div>
 
 					<div class="btn-row">
-						<button class="primary" type="button" on:click={runWithTargetWord}>
-							<span class="btn-icon">▶</span>
-							RUN
+						<button 
+							class="primary" 
+							type="button" 
+							on:click={runAiAgent}
+							disabled={isAiRunning}
+						>
+							<span class="btn-icon">{isAiRunning ? '⏳' : '▶'}</span>
+							{isAiRunning ? 'RUNNING...' : 'RUN'}
 						</button>
-						<button class="secondary" type="button" on:click={() => runWithTargetWord()}>
+						<button 
+							class="secondary" 
+							type="button" 
+							on:click={resetGame}
+							disabled={isAiRunning}
+						>
 							<span class="btn-icon">↻</span>
 							RESET
 						</button>
