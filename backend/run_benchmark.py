@@ -29,7 +29,7 @@ except ImportError:
 # Add backend to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from app.services.algorithms import CSPSolver, HillClimbingSolver, StochasticHillClimbingSolver
+from app.services.algorithms import CSPSolver, HillClimbingSolver, StochasticHillClimbingSolver, EntropySolver
 
 
 # ============== WORDLE GAME SIMULATION ==============
@@ -300,23 +300,29 @@ class GeneticAlgorithm(BaseAlgorithm):
 
 
 class EntropyAlgorithm(BaseAlgorithm):
-    """Placeholder for Entropy - will import from app.services.algorithms.entropy"""
+    """Wrapper for EntropySolver from app.services.algorithms.entropy"""
     name = "entropy"
     
     def __init__(self, word_manager: WordManager):
         super().__init__(word_manager)
-        self.guess_count = 0
+        self.solver = EntropySolver(word_list=word_manager.all_words)
     
     def get_guess(self) -> str:
-        self.guess_count += 1
-        if self.guess_count == 1:
-            return "CRANE"
-        remaining = self.word_manager.remaining_words
-        return remaining[0] if remaining else "CRANE"
+        return self.solver.make_prediction()
+    
+    def update(self, guess: str, feedback: List[LetterState]):
+        color_map = {
+            LetterState.CORRECT: 'G',
+            LetterState.PRESENT: 'Y', 
+            LetterState.ABSENT: 'B'
+        }
+        colors = ''.join(color_map[f] for f in feedback)
+        self.solver.update_feedback(guess, colors)
+        super().update(guess, feedback)
     
     def reset(self):
         super().reset()
-        self.guess_count = 0
+        self.solver.reset()
 
 
 # ============== ALGORITHM REGISTRY ==============
