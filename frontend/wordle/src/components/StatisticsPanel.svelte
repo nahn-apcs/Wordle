@@ -7,10 +7,10 @@
 		{ value: "csp", label: "CSP" },
 		{ value: "hill_climb", label: "Hill Climbing" },
 		{ value: "stochastic_hc", label: "Stochastic Hill Climbing" },
-		{ value: "sa", label: "Simulated Annealing" },
-		{ value: "genetic", label: "Genetic Algorithm" },
-		{ value: "hc_entropy", label: "HC Entropy" },
+		{ value: "hc_entropy", label: "Hill Climbing Entropy" },
 		{ value: "stochastic_hc_entropy", label: "Stochastic HC Entropy" },
+		{ value: "sa", label: "Simulated Annealing" },
+		{ value: "sa_entropy", label: "Simulated Annealing Entropy" },
 	];
 
 	let selectedAlgo: Algorithm = "csp";

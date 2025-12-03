@@ -8,8 +8,8 @@
   "avg_guesses_won": 4.346482532303275,
   "min_guesses": 1,
   "max_guesses": 6,
-  "total_time_sec": 408.2507297920238,
-  "avg_time_ms": 25.77444064882761,
+  "total_time_sec": 396.0727776670028,
+  "avg_time_ms": 24.9641420674053,
   "distribution": {
     "solved_in_1": 1,
     "solved_in_2": 33,
@@ -22,4 +22,3 @@
     "solved_in_9": 6
   }
 }
-

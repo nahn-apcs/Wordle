@@ -35,6 +35,8 @@ from app.services.algorithms import (
     StochasticHillClimbingSolver, 
     HillClimbingEntropySolver,
     StochasticHCEntropySolver,
+    SASolver,
+    SAEntropySolver,
 )
 
 
@@ -286,12 +288,55 @@ class StochasticHCAlgorithm(BaseAlgorithm):
 
 
 class SimulatedAnnealingAlgorithm(BaseAlgorithm):
-    """Placeholder for SA - will import from app.services.algorithms.simulated_annealing"""
+    """Wrapper for SASolver (heuristic-based SA)"""
     name = "sa"
     
+    def __init__(self, word_manager: WordManager):
+        super().__init__(word_manager)
+        self.solver = SASolver(word_list=word_manager.all_words)
+    
     def get_guess(self) -> str:
-        remaining = self.word_manager.remaining_words
-        return remaining[0] if remaining else "CRANE"
+        return self.solver.make_prediction()
+    
+    def update(self, guess: str, feedback: List[LetterState]):
+        color_map = {
+            LetterState.CORRECT: 'G',
+            LetterState.PRESENT: 'Y', 
+            LetterState.ABSENT: 'B'
+        }
+        colors = ''.join(color_map[f] for f in feedback)
+        self.solver.update_feedback(guess, colors)
+        super().update(guess, feedback)
+    
+    def reset(self):
+        super().reset()
+        self.solver.reset()
+
+
+class SAEntropyAlgorithm(BaseAlgorithm):
+    """Wrapper for SAEntropySolver (entropy-based SA)"""
+    name = "sa_entropy"
+    
+    def __init__(self, word_manager: WordManager):
+        super().__init__(word_manager)
+        self.solver = SAEntropySolver(word_list=word_manager.all_words)
+    
+    def get_guess(self) -> str:
+        return self.solver.make_prediction()
+    
+    def update(self, guess: str, feedback: List[LetterState]):
+        color_map = {
+            LetterState.CORRECT: 'G',
+            LetterState.PRESENT: 'Y', 
+            LetterState.ABSENT: 'B'
+        }
+        colors = ''.join(color_map[f] for f in feedback)
+        self.solver.update_feedback(guess, colors)
+        super().update(guess, feedback)
+    
+    def reset(self):
+        super().reset()
+        self.solver.reset()
 
 
 class GeneticAlgorithm(BaseAlgorithm):
@@ -364,6 +409,7 @@ ALGORITHMS: Dict[str, type] = {
     "hill_climb": HillClimbingAlgorithm,
     "stochastic_hc": StochasticHCAlgorithm,
     "sa": SimulatedAnnealingAlgorithm,
+    "sa_entropy": SAEntropyAlgorithm,
     "genetic": GeneticAlgorithm,
     "hc_entropy": HCEntropyAlgorithm,
     "stochastic_hc_entropy": StochasticHCEntropyAlgorithm,

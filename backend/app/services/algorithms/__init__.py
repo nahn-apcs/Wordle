@@ -28,6 +28,8 @@ from .hill_climbing import HillClimbingSolver
 from .stochastic_hc import StochasticHillClimbingSolver
 from .hill_climbing_entropy import HillClimbingEntropySolver
 from .stochastic_hc_entropy import StochasticHCEntropySolver
+from .simulated_annealing import SASolver
+from .sa_entropy import SAEntropySolver
 from .pattern_matrix import ensure_pattern_matrix, get_pattern, get_pattern_batch
 
 __all__ = [
@@ -38,6 +40,8 @@ __all__ = [
     'StochasticHillClimbingSolver',
     'HillClimbingEntropySolver',
     'StochasticHCEntropySolver',
+    'SASolver',
+    'SAEntropySolver',
     'ensure_pattern_matrix',
     'get_pattern',
     'get_pattern_batch',

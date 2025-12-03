@@ -1,0 +1,24 @@
+{
+  "algorithm": "sa",
+  "total_words": 14855,
+  "wins": 14634,
+  "losses": 221,
+  "win_rate": 98.51228542578257,
+  "avg_guesses": 4.382295523392797,
+  "avg_guesses_won": 4.340371737050704,
+  "min_guesses": 1,
+  "max_guesses": 6,
+  "total_time_sec": 440.87690020899754,
+  "avg_time_ms": 28.013124706972796,
+  "distribution": {
+    "solved_in_1": 1,
+    "solved_in_2": 31,
+    "solved_in_3": 1746,
+    "solved_in_4": 7160,
+    "solved_in_5": 4600,
+    "solved_in_6": 1096,
+    "solved_in_7": 191,
+    "solved_in_8": 25,
+    "solved_in_9": 5
+  }
+}

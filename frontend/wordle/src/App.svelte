@@ -380,10 +380,10 @@
 							<option value="csp">CSP</option>
 							<option value="hill_climb">Hill Climbing</option>
 							<option value="stochastic_hc">Stochastic Hill Climbing</option>
-							<option value="sa">Simulated Annealing</option>
-							<option value="genetic">Genetic Algorithm</option>
-							<option value="hc_entropy">HC Entropy</option>
+							<option value="hc_entropy">Hill Climbing Entropy</option>
 							<option value="stochastic_hc_entropy">Stochastic HC Entropy</option>
+							<option value="sa">Simulated Annealing</option>
+							<option value="sa_entropy">Simulated Annealing Entropy</option>
 						</select>
 					</div>
 

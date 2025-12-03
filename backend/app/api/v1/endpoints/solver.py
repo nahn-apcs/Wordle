@@ -22,6 +22,8 @@ from app.services.algorithms import (
     StochasticHillClimbingSolver,
     HillClimbingEntropySolver,
     StochasticHCEntropySolver,
+    SASolver,
+    SAEntropySolver,
 )
 
 router = APIRouter()
@@ -38,6 +40,8 @@ ALGORITHMS = {
     "stochastic_hc": StochasticHillClimbingSolver,
     "hc_entropy": HillClimbingEntropySolver,
     "stochastic_hc_entropy": StochasticHCEntropySolver,
+    "sa": SASolver,
+    "sa_entropy": SAEntropySolver,
 }
 
 
@@ -139,10 +143,11 @@ async def list_algorithms():
     return [
         AlgorithmInfo(id="csp", name="CSP", description="Constraint Satisfaction Problem solver"),
         AlgorithmInfo(id="hill_climb", name="Hill Climbing", description="Hill climbing optimization"),
-        AlgorithmInfo(id="stochastic_hc", name="Stochastic Hill Climbing", description="Stochastic hill climbing"),
-        AlgorithmInfo(id="sa", name="Simulated Annealing", description="Simulated annealing optimization"),
-        AlgorithmInfo(id="genetic", name="Genetic Algorithm", description="Genetic algorithm solver"),
-        AlgorithmInfo(id="entropy", name="Entropy-based", description="Maximum entropy information gain"),
+        AlgorithmInfo(id="stochastic_hc", name="Stochastic HC", description="Stochastic hill climbing"),
+        AlgorithmInfo(id="hc_entropy", name="HC Entropy", description="Hill climbing with entropy"),
+        AlgorithmInfo(id="stochastic_hc_entropy", name="Stochastic HC Entropy", description="Stochastic HC with entropy"),
+        AlgorithmInfo(id="sa", name="SA", description="Simulated annealing with heuristic"),
+        AlgorithmInfo(id="sa_entropy", name="SA Entropy", description="Simulated annealing with entropy"),
     ]
 
 
