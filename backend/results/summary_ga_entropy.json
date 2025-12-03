@@ -1,22 +1,23 @@
 {
   "algorithm": "ga_entropy",
-  "total_words": 1000,
-  "wins": 995,
-  "losses": 5,
-  "win_rate": 99.5,
-  "avg_guesses": 4.297,
-  "avg_guesses_won": 4.283417085427136,
+  "total_words": 14855,
+  "wins": 14794,
+  "losses": 61,
+  "win_rate": 99.58936385055537,
+  "avg_guesses": 4.307842477280377,
+  "avg_guesses_won": 4.296539137488171,
   "min_guesses": 2,
   "max_guesses": 6,
-  "total_time_sec": 248.84761558399987,
-  "avg_time_ms": 246.9945063490013,
+  "total_time_sec": 3536.6156405420006,
+  "avg_time_ms": 236.2346023460164,
   "distribution": {
     "solved_in_1": 0,
-    "solved_in_2": 3,
-    "solved_in_3": 107,
-    "solved_in_4": 537,
-    "solved_in_5": 301,
-    "solved_in_6": 47,
-    "solved_in_7": 5
+    "solved_in_2": 35,
+    "solved_in_3": 1546,
+    "solved_in_4": 7842,
+    "solved_in_5": 4739,
+    "solved_in_6": 632,
+    "solved_in_7": 58,
+    "solved_in_8": 3
   }
 }

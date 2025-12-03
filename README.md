@@ -128,13 +128,16 @@ Benchmark results on all 14,855 words:
 | Algorithm | Win Rate | Avg Guesses | Time/Word | Total Time |
 |-----------|----------|-------------|-----------|------------|
 | **HC Entropy** | **99.73%** | **4.28** | **19.3ms** | **311.9s** |
+| SA Entropy | 99.65% | 4.27 | 341.3ms | 5122.2s |
+| GA Entropy | 99.59% | 4.31 | 236.2ms | 3536.6s |
 | Stochastic HC Entropy | 99.41% | 4.33 | 153.0ms | 2299.4s |
-| **Simulated Annealing** | **98.51%** | **4.38** | **28.0ms** | **440.9s** |
+| Simulated Annealing | 98.51% | 4.38 | 28.0ms | 440.9s |
 | Hill Climbing | 98.47% | 4.39 | 25.0ms | 396.1s |
+| Genetic Algorithm | 98.47% | 4.38 | 135.7ms | 2043.9s |
 | Stochastic Hill Climbing | 96.30% | 4.56 | 25.9ms | 409.1s |
-| Genetic Algorithm* | 95.80% | 4.52 | 80.4ms | - |
-| SA Entropy* | 95.00% | 4.67 | 156.1ms | - |
-| CSP (Brute Force) | 74.00% | 5.65 | 14.6ms | 242.9s |
+| CSP (Brute Force) | 73.98% | 5.65 | 14.6ms | 242.9s |
+
+Entropy variants spend more time exploring the search space (hence the higher runtime per word) but deliver the most reliable win rates.
 
 
 ### Guess Distribution
@@ -142,9 +145,12 @@ Benchmark results on all 14,855 words:
 | Algorithm | 1 | 2 | 3 | 4 | 5 | 6 | Fail (>6) |
 |-----------|---|------|------|------|------|------|-----------|
 | **HC Entropy** | **1** | **28** | **1,602** | **8,102** | **4,457** | **625** | **40** |
+| SA Entropy | 1 | 42 | 1,674 | 8,011 | 4,488 | 587 | 52 |
+| GA Entropy | 0 | 35 | 1,546 | 7,842 | 4,739 | 632 | 61 |
 | Stochastic HC Entropy | 1 | 29 | 1,581 | 7,583 | 4,822 | 752 | 87 |
 | Simulated Annealing | 1 | 31 | 1,746 | 7,160 | 4,600 | 1,096 | 221 |
 | Hill Climbing | 1 | 33 | 1,725 | 7,120 | 4,634 | 1,114 | 228 |
+| Genetic Algorithm | 1 | 31 | 1,771 | 7,118 | 4,610 | 1,096 | 228 |
 | Stochastic HC | 0 | 27 | 1,564 | 6,238 | 4,887 | 1,589 | 550 |
 | CSP | 1 | 116 | 1,022 | 2,782 | 3,847 | 3,221 | 3,866 |
 
