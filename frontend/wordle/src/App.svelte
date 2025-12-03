@@ -92,7 +92,7 @@
 	type PlayMode = "human" | "ai";
 	let playMode: PlayMode = "human";
 
-	let hintsEnabled = true;
+	let hintsEnabled = false;
 	let gameComponent: Game;
 
 	function clickCandidate(candidateWord: string) {
@@ -241,24 +241,63 @@
 	}
 
 	// Placeholder UI data - will be updated from API
-	let topCandidates: Array<{ word: string; score: number }> = [
-		{ word: "CRANE", score: 9.2 },
-		{ word: "SLATE", score: 8.8 },
-		{ word: "TRACE", score: 8.5 },
-		{ word: "ARISE", score: 8.2 },
-		{ word: "ROAST", score: 8.0 },
-	];
+	let topCandidates: Array<{ word: string; score: number }> = [];
+	let isLoadingHints = false;
+
+	// Session ID for hints (separate from AI agent session)
+	let hintsSessionId = generateSessionId();
+	let lastHintsGuessCount = -1;
+	let hintsSolverInitialized = false;
 
 	// Fetch candidates from API when game state changes (for human mode hints)
 	async function fetchCandidates() {
 		if (playMode !== "human" || !hintsEnabled) return;
+		if (!state || isLoadingHints) return;
+		
+		// Only fetch if guess count changed
+		if (state.guesses === lastHintsGuessCount && hintsSolverInitialized) return;
+		
+		isLoadingHints = true;
 		
 		try {
-			const response = await getCandidates(sessionId, "csp", 5);
+			// If game just started or reset, or solver not initialized
+			if (state.guesses === 0 || !hintsSolverInitialized) {
+				hintsSessionId = generateSessionId();
+				await resetSolver(hintsSessionId, "hc_entropy");
+				hintsSolverInitialized = true;
+				lastHintsGuessCount = 0;
+				
+				// If there are already guesses (e.g., hints just enabled), replay them
+				for (let i = 0; i < state.guesses; i++) {
+					const guess = state.board.words[i];
+					const guessState = state.board.state[i];
+					if (guess && guessState) {
+						const feedback = stateToFeedback(guessState);
+						await updateSolver(hintsSessionId, guess.toUpperCase(), feedback);
+					}
+				}
+				lastHintsGuessCount = state.guesses;
+			} else if (state.guesses > lastHintsGuessCount) {
+				// Update solver with new guesses since last fetch
+				for (let i = lastHintsGuessCount; i < state.guesses; i++) {
+					const guess = state.board.words[i];
+					const guessState = state.board.state[i];
+					if (guess && guessState) {
+						const feedback = stateToFeedback(guessState);
+						await updateSolver(hintsSessionId, guess.toUpperCase(), feedback);
+					}
+				}
+				lastHintsGuessCount = state.guesses;
+			}
+			
+			// Get top candidates using hc_entropy
+			const response = await getCandidates(hintsSessionId, "hc_entropy", 5);
 			topCandidates = response.candidates;
 		} catch (e) {
-			// API not available, keep placeholder data
-			console.debug("Could not fetch candidates:", e);
+			console.error("Could not fetch candidates:", e);
+			// Keep previous candidates on error
+		} finally {
+			isLoadingHints = false;
 		}
 	}
 
@@ -268,6 +307,11 @@
 
 	$: if (playMode === "human") aiAlgo = "csp";
 
+	// Fetch hints when game state changes (after a guess is made)
+	$: if (hintsEnabled && playMode === "human" && state && state.guesses !== lastHintsGuessCount) {
+		fetchCandidates();
+	}
+
 	// Reset game and solver when switching between modes
 	let prevPlayMode: PlayMode | null = null;
 	$: {
@@ -275,6 +319,10 @@
 			// Only reset when mode actually changes (not on initial mount)
 			resetGame();
 			targetWord = "";
+			// Reset hints state too
+			lastHintsGuessCount = -1;
+			hintsSolverInitialized = false;
+			topCandidates = [];
 		}
 		prevPlayMode = playMode;
 	}
@@ -444,28 +492,43 @@
 				</div>
 
 				{#if hintsEnabled}
-					<div class="section-title">Top candidates</div>
+					<div class="section-title">
+						Top candidates
+						{#if isLoadingHints}
+							<span class="loading-indicator">⏳</span>
+						{/if}
+					</div>
 
 					<ul class="rank-list">
-						{#each topCandidates.slice(0, 5) as c}
-							<!-- svelte-ignore a11y-click-events-have-key-events -->
-							<li 
-								class="rank-item clickable" 
-								on:click={() => clickCandidate(c.word)}
-								title="Click to use this word"
-							>
-								<div class="rank-word">{c.word}</div>
-								<div class="rank-bar">
-									<div
-										class="rank-fill"
-										style={`width:${Math.max(6, Math.round((c.score / maxScore()) * 100))}%`}
-									></div>
-								</div>
-								<div class="rank-score">
-									{c.score.toFixed(1)}
-								</div>
+						{#if topCandidates.length === 0}
+							<li class="rank-item empty">
+								{#if isLoadingHints}
+									Loading suggestions...
+								{:else}
+									Click 👁️ to get AI suggestions
+								{/if}
 							</li>
-						{/each}
+						{:else}
+							{#each topCandidates.slice(0, 5) as c}
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<li 
+									class="rank-item clickable" 
+									on:click={() => clickCandidate(c.word)}
+									title="Click to use this word"
+								>
+									<div class="rank-word">{c.word}</div>
+									<div class="rank-bar">
+										<div
+											class="rank-fill"
+											style={`width:${Math.max(6, Math.round((c.score / maxScore()) * 100))}%`}
+										></div>
+									</div>
+									<div class="rank-score">
+										{c.score.toFixed(1)}
+									</div>
+								</li>
+							{/each}
+						{/if}
 					</ul>
 				{/if}
 
@@ -914,6 +977,18 @@
 		text-transform: uppercase;
 		font-weight: 1000;
 		opacity: 0.7;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.loading-indicator {
+		animation: pulse 1s infinite;
+	}
+
+	@keyframes pulse {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0.5; }
 	}
 
 	.rank-list {
@@ -935,6 +1010,14 @@
 		padding: 10px 10px;
 		box-shadow: 0 10px 18px rgba(0, 0, 0, 0.05);
 		transition: all 0.2s ease;
+	}
+
+	.rank-item.empty {
+		grid-template-columns: 1fr;
+		text-align: center;
+		color: var(--color-tone-2, #777);
+		font-size: 0.85rem;
+		padding: 20px;
 	}
 
 	.rank-item.clickable {

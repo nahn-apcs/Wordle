@@ -214,19 +214,87 @@ async def get_candidates(request: CandidatesRequest):
     """
     Get top candidate words with scores.
     Used for the ANALYSIS panel hints.
+    
+    For hc_entropy algorithm, returns words with highest entropy (information gain).
     """
     solver = get_or_create_solver(request.session_id, request.algorithm)
     
-    # Get remaining words and score them
-    remaining = solver.remaining_words[:100]  # Limit for performance
+    # Get remaining words from solver (already filtered by feedback)
+    remaining = solver.remaining_words
     
-    # Score words (simple frequency-based scoring for now)
+    # For entropy-based algorithms, use entropy scoring
+    if request.algorithm in ("hc_entropy", "stochastic_hc_entropy"):
+        try:
+            # If only 1 word left, return it as the answer
+            if len(remaining) <= 1:
+                scored = [CandidateWord(word=w, score=0.0) for w in remaining[:request.top_k]]
+                return CandidatesResponse(
+                    candidates=scored,
+                    remaining_count=solver.num_remaining,
+                )
+            
+            # First guess: return pre-computed best openers
+            if solver.num_guesses == 0:
+                # Top 5 words with highest entropy (pre-computed)
+                best_openers = [
+                    CandidateWord(word="SALET", score=6.19),
+                    CandidateWord(word="REAST", score=6.17),
+                    CandidateWord(word="CRATE", score=6.15),
+                    CandidateWord(word="TRACE", score=6.14),
+                    CandidateWord(word="SLATE", score=6.14),
+                ]
+                return CandidatesResponse(
+                    candidates=best_openers[:request.top_k],
+                    remaining_count=solver.num_remaining,
+                )
+            
+            from app.services.algorithms.entropy import get_entropies, get_weights
+            from app.services.algorithms.pattern_matrix import ensure_pattern_matrix
+            
+            # Ensure pattern matrix is loaded
+            ensure_pattern_matrix(solver.word_list)
+            
+            # After first guess, remaining words decrease quickly
+            # Computing entropy for all words against smaller remaining set is fast
+            allowed_words = solver.word_list
+            possible_words = remaining
+            
+            # Uniform priors
+            priors = {w: 1.0 for w in possible_words}
+            weights = get_weights(possible_words, priors)
+            
+            # Calculate entropy for all guesses
+            ents = get_entropies(allowed_words, possible_words, weights)
+            
+            # Get top K
+            top_k = min(request.top_k, len(allowed_words))
+            top_indices = ents.argsort()[-top_k:][::-1]
+            
+            scored = []
+            for idx in top_indices:
+                word = allowed_words[idx]
+                score = float(ents[idx])
+                scored.append(CandidateWord(word=word, score=round(score, 2)))
+            
+            return CandidatesResponse(
+                candidates=scored,
+                remaining_count=solver.num_remaining,
+            )
+        except Exception as e:
+            print(f"Error computing entropy scores: {e}")
+            import traceback
+            traceback.print_exc()
+            # Fall back to simple scoring
+    
+    # Fallback: simple frequency-based scoring
+    remaining_limited = remaining[:100]  # Limit for performance
+    
     from collections import Counter
-    all_letters = "".join(remaining)
+    all_letters = "".join(remaining_limited)
     freq = Counter(all_letters)
     
     scored = []
-    for word in remaining:
+    for word in remaining_limited:
         unique = set(word)
         score = sum(freq.get(c, 0) for c in unique) / 100  # Normalize
         scored.append(CandidateWord(word=word, score=round(score, 1)))
