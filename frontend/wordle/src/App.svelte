@@ -49,7 +49,7 @@
 
 	const hash = window.location.hash.replace("#", "").split("/");
 	const key = hash[0] as keyof typeof GameMode;
-	const modeVal: GameMode = key in GameMode ? GameMode[key] : GameMode.daily;
+	const modeVal: GameMode = key in GameMode ? GameMode[key] : GameMode.infinite;
 
 	// Historical mode support: #DAILY/123 (word number)
 	if (hash.length > 1 && !isNaN(+hash[1])) {
