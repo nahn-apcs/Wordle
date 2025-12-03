@@ -256,11 +256,11 @@
 		<Definition {word} alternates={2} />
 	{:else}
 		<!-- Fade with delay is to prevent a bright red button from appearing as soon as refresh is pressed -->
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div
 			in:fade={{ delay: 300 }}
 			class="button concede"
 			on:click={concede}
-			on:keydown={concede}
 		>
 			give up
 		</div>
@@ -270,7 +270,8 @@
 <Modal fullscreen={true} bind:visible={showSettings}>
 	<Settings state={game} on:historical={() => (showHistorical = true)} />
 	{#if game.active}
-		<div class="button concede" on:click={concede} on:keydown={concede}>give up</div>
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<div class="button concede" on:click={concede}>give up</div>
 	{/if}
 	<Tips change={showSettings} />
 

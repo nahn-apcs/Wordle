@@ -30,18 +30,18 @@
 <div class="outer">
 	<div class="number">Tip {index + 1}/{tips.length}</div>
 	<div class="tip">{tips[index]}</div>
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<svg
 		class="left"
 		on:click={previousTip}
-		on:keydown={previousTip}
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 100 100"
 	>
 		<path d="M75,0L25,50L75,100z" />
 	</svg>
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<svg
 		on:click={nextTip}
-		on:keypress={nextTip}
 		class="right"
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 100 100"

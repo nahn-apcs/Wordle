@@ -298,7 +298,7 @@
 				<div class="segmented">
 					<button
 						class:active={playMode === "human"}
-						on:click={() => (playMode = "human")}
+						on:click={(e) => { playMode = "human"; e.currentTarget.blur(); }}
 						aria-pressed={playMode === "human"}
 						type="button"
 					>
@@ -307,7 +307,7 @@
 
 					<button
 						class:active={playMode === "ai"}
-						on:click={() => (playMode = "ai")}
+						on:click={(e) => { playMode = "ai"; e.currentTarget.blur(); }}
 						aria-pressed={playMode === "ai"}
 						type="button"
 					>
@@ -334,7 +334,8 @@
 							<option value="stochastic_hc">Stochastic Hill Climbing</option>
 							<option value="sa">Simulated Annealing</option>
 							<option value="genetic">Genetic Algorithm</option>
-							<option value="entropy">Entropy-based</option>
+							<option value="hc_entropy">HC Entropy</option>
+							<option value="stochastic_hc_entropy">Stochastic HC Entropy</option>
 						</select>
 					</div>
 
@@ -347,13 +348,11 @@
 								placeholder="Click 🎲 to pick"
 								readonly
 								aria-readonly="true"
-								on:keydown|stopPropagation
-								on:keyup|stopPropagation
 							/>
 							<button
 								class="icon-btn"
 								type="button"
-								on:click={randomTargetWord}
+								on:click={(e) => { randomTargetWord(); e.currentTarget.blur(); }}
 								title="Random valid word"
 								aria-label="Random valid word"
 							>
@@ -366,7 +365,7 @@
 						<button 
 							class="primary" 
 							type="button" 
-							on:click={runAiAgent}
+							on:click={(e) => { runAiAgent(); e.currentTarget.blur(); }}
 							disabled={isAiRunning}
 						>
 							<span class="btn-icon">{isAiRunning ? '⏳' : '▶'}</span>
@@ -375,7 +374,7 @@
 						<button 
 							class="secondary" 
 							type="button" 
-							on:click={resetGame}
+							on:click={(e) => { resetGame(); e.currentTarget.blur(); }}
 							disabled={isAiRunning}
 						>
 							<span class="btn-icon">↻</span>
@@ -415,7 +414,7 @@
 				<button
 					class="eye-btn"
 					class:off={!hintsEnabled}
-					on:click={() => (hintsEnabled = !hintsEnabled)}
+					on:click={(e) => { hintsEnabled = !hintsEnabled; e.currentTarget.blur(); }}
 					aria-pressed={hintsEnabled}
 					title={hintsEnabled ? "Disable hints" : "Enable hints"}
 					type="button"
@@ -449,12 +448,10 @@
 
 					<ul class="rank-list">
 						{#each topCandidates.slice(0, 5) as c}
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
 							<li 
 								class="rank-item clickable" 
 								on:click={() => clickCandidate(c.word)}
-								on:keypress={(e) => e.key === 'Enter' && clickCandidate(c.word)}
-								role="button"
-								tabindex="0"
 								title="Click to use this word"
 							>
 								<div class="rank-word">{c.word}</div>
@@ -631,6 +628,12 @@
 			box-shadow 0.14s ease,
 			opacity 0.14s ease,
 			transform 0.12s ease;
+		outline: none;
+	}
+
+	.segmented button:focus {
+		outline: none;
+		box-shadow: none;
 	}
 
 	.segmented button.active {
@@ -756,6 +759,11 @@
 		font-size: 1.2rem;
 		box-shadow: 0 4px 12px rgba(106, 170, 100, 0.15);
 		transition: all 0.25s ease;
+		outline: none;
+	}
+
+	.icon-btn:focus {
+		outline: none;
 	}
 
 	.icon-btn:hover {
@@ -790,6 +798,11 @@
 		align-items: center;
 		justify-content: center;
 		gap: 8px;
+		outline: none;
+	}
+
+	.primary:focus {
+		outline: none;
 	}
 
 	.primary::before {
@@ -847,6 +860,11 @@
 		padding: 8px 10px;
 		cursor: pointer;
 		box-shadow: 0 10px 18px rgba(0, 0, 0, 0.06);
+		outline: none;
+	}
+
+	.eye-btn:focus {
+		outline: none;
 	}
 
 	.eye-btn.off {
@@ -989,6 +1007,12 @@
 		font-size: 0.8rem;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
+		outline: none;
+	}
+
+	.primary:focus,
+	.secondary:focus {
+		outline: none;
 	}
 
 	.secondary {

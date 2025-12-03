@@ -154,7 +154,7 @@ export function newSeed(mode: GameMode, time?: number) {
 }
 
 export const modeData: ModeData = {
-	default: GameMode.daily,
+	default: GameMode.infinite,
 	modes: [
 		{
 			name: "Daily",
@@ -315,7 +315,7 @@ export class GameState extends Storable {
 
 export class Settings extends Storable {
 	public hard = new Array(modeData.modes.length).fill(false);
-	public dark = true;
+	public dark = false;
 	public colorblind = false;
 	public tutorial: 0 | 1 | 2 | 3 = 3;
 

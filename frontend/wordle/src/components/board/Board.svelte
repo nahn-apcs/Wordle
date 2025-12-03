@@ -89,11 +89,11 @@
 		</svg>
 	{/if}
 	{#if tutorial}
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div
 			transition:scale
 			class="tutorial"
 			on:click={() => dispatch("closeTutPopUp")}
-			on:keydown={() => dispatch("closeTutPopUp")}
 		>
 			double tap a row to see a word's definition, or how many words can be played there
 			<span class="ok">OK</span>

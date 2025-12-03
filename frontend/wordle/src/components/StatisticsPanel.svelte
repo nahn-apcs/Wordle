@@ -9,7 +9,8 @@
 		{ value: "stochastic_hc", label: "Stochastic Hill Climbing" },
 		{ value: "sa", label: "Simulated Annealing" },
 		{ value: "genetic", label: "Genetic Algorithm" },
-		{ value: "entropy", label: "Entropy-based" },
+		{ value: "hc_entropy", label: "HC Entropy" },
+		{ value: "stochastic_hc_entropy", label: "Stochastic HC Entropy" },
 	];
 
 	let selectedAlgo: Algorithm = "csp";
@@ -142,7 +143,7 @@
 		<button
 			class="run-btn"
 			class:running={isRunning}
-			on:click={isRunning ? stopAlgorithm : runAlgorithm}
+			on:click={(e) => { isRunning ? stopAlgorithm() : runAlgorithm(); e.currentTarget.blur(); }}
 		>
 			{#if isRunning}
 				<span class="stop-icon">⏹</span> STOP ({progress.toFixed(0)}%)

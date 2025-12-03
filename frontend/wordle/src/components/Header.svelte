@@ -65,11 +65,11 @@
 		</GameIcon>
 	</div>
 	{#if tutorial}
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div
 			transition:scale
 			class="tutorial"
 			on:click={() => dispatch("closeTutPopUp")}
-			on:keydown={() => dispatch("closeTutPopUp")}
 		>
 			Swipe board or tap WORDLE+ to change game mode
 			<span class="ok">OK</span>

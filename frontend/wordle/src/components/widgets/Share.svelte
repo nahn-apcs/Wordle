@@ -21,7 +21,8 @@
 	}
 </script>
 
-<div on:click={copyStats} on:keydown={copyStats}>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div on:click={copyStats}>
 	share
 	<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
 		<path

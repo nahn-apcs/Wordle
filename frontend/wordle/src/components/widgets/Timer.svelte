@@ -36,10 +36,10 @@
 			)}`.padStart(2, "0")}:{`${Math.floor((ms % MS.MINUTE) / MS.SECOND)}`.padStart(2, "0")}
 		</div>
 	{:else}
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div
 			class="button"
 			on:click={() => dispatch("reload")}
-			on:keydown={() => dispatch("reload")}
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 				<path
