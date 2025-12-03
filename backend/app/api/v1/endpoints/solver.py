@@ -20,7 +20,8 @@ from app.services.algorithms import (
     WordleSolver, 
     HillClimbingSolver, 
     StochasticHillClimbingSolver,
-    EntropySolver
+    HillClimbingEntropySolver,
+    StochasticHCEntropySolver,
 )
 
 router = APIRouter()
@@ -35,10 +36,8 @@ ALGORITHMS = {
     "csp": CSPSolver,
     "hill_climb": HillClimbingSolver,
     "stochastic_hc": StochasticHillClimbingSolver,
-    "entropy": EntropySolver,
-    # TODO: Add more algorithms when implemented
-    # "sa": SimulatedAnnealingSolver,
-    # "genetic": GeneticSolver,
+    "hc_entropy": HillClimbingEntropySolver,
+    "stochastic_hc_entropy": StochasticHCEntropySolver,
 }
 
 

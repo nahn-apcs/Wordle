@@ -26,7 +26,8 @@ from .base import WordleSolver
 from .csp import CSPSolver, BruteForceSolver
 from .hill_climbing import HillClimbingSolver
 from .stochastic_hc import StochasticHillClimbingSolver
-from .entropy import EntropySolver
+from .hill_climbing_entropy import HillClimbingEntropySolver
+from .stochastic_hc_entropy import StochasticHCEntropySolver
 from .pattern_matrix import ensure_pattern_matrix, get_pattern, get_pattern_batch
 
 __all__ = [
@@ -35,7 +36,8 @@ __all__ = [
     'BruteForceSolver',
     'HillClimbingSolver',
     'StochasticHillClimbingSolver',
-    'EntropySolver',
+    'HillClimbingEntropySolver',
+    'StochasticHCEntropySolver',
     'ensure_pattern_matrix',
     'get_pattern',
     'get_pattern_batch',

@@ -127,17 +127,21 @@ Benchmark results on all 14,855 words:
 
 | Algorithm | Win Rate | Avg Guesses | Time/Word | Total Time |
 |-----------|----------|-------------|-----------|------------|
-| CSP (Brute Force) | 74.0% | 5.65 | 14.6ms | 242.9s |
+| **HC Entropy** | **99.7%** | **4.28** | **19.3ms** | **311.9s** |
+| Stochastic HC Entropy | 99.4% | 4.33 | 153.0ms | 2299.4s |
 | Hill Climbing | 98.5% | 4.39 | 25.8ms | 408.3s |
 | Stochastic Hill Climbing | 95.9% | 4.57 | 26.9ms | 425.2s |
+| CSP (Brute Force) | 74.0% | 5.65 | 14.6ms | 242.9s |
 
 ### Guess Distribution
 
 | Algorithm | 1 | 2 | 3 | 4 | 5 | 6 | Fail (>6) |
 |-----------|---|------|------|------|------|------|-----------|
-| CSP | 1 | 116 | 1,022 | 2,782 | 3,847 | 3,221 | 3,866 |
+| **HC Entropy** | **1** | **28** | **1,602** | **8,102** | **4,457** | **625** | **40** |
+| Stochastic HC Entropy | 1 | 29 | 1,581 | 7,583 | 4,822 | 752 | 87 |
 | Hill Climbing | 1 | 33 | 1,725 | 7,120 | 4,634 | 1,114 | 228 |
 | Stochastic HC | 0 | 32 | 1,570 | 6,198 | 4,867 | 1,576 | 612 |
+| CSP | 1 | 116 | 1,022 | 2,782 | 3,847 | 3,221 | 3,866 |
 
 - **Win**: Solved within ≤6 guesses
 - **Fail**: Required >6 guesses to solve

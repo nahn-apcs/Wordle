@@ -1,0 +1,23 @@
+{
+  "algorithm": "stochastic_hc_entropy",
+  "total_words": 14855,
+  "wins": 14768,
+  "losses": 87,
+  "win_rate": 99.41433860652978,
+  "avg_guesses": 4.333221137664086,
+  "avg_guesses_won": 4.317172264355363,
+  "min_guesses": 1,
+  "max_guesses": 6,
+  "total_time_sec": 2299.384691167,
+  "avg_time_ms": 153.0419646140031,
+  "distribution": {
+    "solved_in_1": 1,
+    "solved_in_2": 29,
+    "solved_in_3": 1581,
+    "solved_in_4": 7583,
+    "solved_in_5": 4822,
+    "solved_in_6": 752,
+    "solved_in_7": 82,
+    "solved_in_8": 5
+  }
+}

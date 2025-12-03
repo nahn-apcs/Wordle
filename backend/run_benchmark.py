@@ -29,7 +29,13 @@ except ImportError:
 # Add backend to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from app.services.algorithms import CSPSolver, HillClimbingSolver, StochasticHillClimbingSolver, EntropySolver
+from app.services.algorithms import (
+    CSPSolver, 
+    HillClimbingSolver, 
+    StochasticHillClimbingSolver, 
+    HillClimbingEntropySolver,
+    StochasticHCEntropySolver,
+)
 
 
 # ============== WORDLE GAME SIMULATION ==============
@@ -299,13 +305,39 @@ class GeneticAlgorithm(BaseAlgorithm):
         return random.choice(remaining)
 
 
-class EntropyAlgorithm(BaseAlgorithm):
-    """Wrapper for EntropySolver from app.services.algorithms.entropy"""
-    name = "entropy"
+class HCEntropyAlgorithm(BaseAlgorithm):
+    """Wrapper for HillClimbingEntropySolver"""
+    name = "hc_entropy"
     
     def __init__(self, word_manager: WordManager):
         super().__init__(word_manager)
-        self.solver = EntropySolver(word_list=word_manager.all_words)
+        self.solver = HillClimbingEntropySolver(word_list=word_manager.all_words)
+    
+    def get_guess(self) -> str:
+        return self.solver.make_prediction()
+    
+    def update(self, guess: str, feedback: List[LetterState]):
+        color_map = {
+            LetterState.CORRECT: 'G',
+            LetterState.PRESENT: 'Y', 
+            LetterState.ABSENT: 'B'
+        }
+        colors = ''.join(color_map[f] for f in feedback)
+        self.solver.update_feedback(guess, colors)
+        super().update(guess, feedback)
+    
+    def reset(self):
+        super().reset()
+        self.solver.reset()
+
+
+class StochasticHCEntropyAlgorithm(BaseAlgorithm):
+    """Wrapper for StochasticHCEntropySolver"""
+    name = "stochastic_hc_entropy"
+    
+    def __init__(self, word_manager: WordManager):
+        super().__init__(word_manager)
+        self.solver = StochasticHCEntropySolver(word_list=word_manager.all_words, top_m=5)
     
     def get_guess(self) -> str:
         return self.solver.make_prediction()
@@ -326,7 +358,6 @@ class EntropyAlgorithm(BaseAlgorithm):
 
 
 # ============== ALGORITHM REGISTRY ==============
-# TODO: Update these imports when algorithms are implemented in app/services/algorithms/
 
 ALGORITHMS: Dict[str, type] = {
     "csp": CSPAlgorithm,
@@ -334,7 +365,8 @@ ALGORITHMS: Dict[str, type] = {
     "stochastic_hc": StochasticHCAlgorithm,
     "sa": SimulatedAnnealingAlgorithm,
     "genetic": GeneticAlgorithm,
-    "entropy": EntropyAlgorithm,
+    "hc_entropy": HCEntropyAlgorithm,
+    "stochastic_hc_entropy": StochasticHCEntropyAlgorithm,
 }
 
 

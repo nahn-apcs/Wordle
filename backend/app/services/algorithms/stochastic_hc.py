@@ -32,7 +32,7 @@ except ImportError:
 
 
 # Default number of top candidates to randomly choose from
-DEFAULT_TOP_M = 10
+DEFAULT_TOP_M = 5
 
 
 class StochasticHillClimbingSolver(WordleSolver):
