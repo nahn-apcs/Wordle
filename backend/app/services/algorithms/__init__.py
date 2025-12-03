@@ -30,6 +30,8 @@ from .hill_climbing_entropy import HillClimbingEntropySolver
 from .stochastic_hc_entropy import StochasticHCEntropySolver
 from .simulated_annealing import SASolver
 from .sa_entropy import SAEntropySolver
+from .genetic import GASolver
+from .ga_entropy import GAEntropySolver
 from .pattern_matrix import ensure_pattern_matrix, get_pattern, get_pattern_batch
 
 __all__ = [
@@ -42,6 +44,8 @@ __all__ = [
     'StochasticHCEntropySolver',
     'SASolver',
     'SAEntropySolver',
+    'GASolver',
+    'GAEntropySolver',
     'ensure_pattern_matrix',
     'get_pattern',
     'get_pattern_batch',

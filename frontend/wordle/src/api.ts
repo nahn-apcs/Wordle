@@ -47,7 +47,16 @@ export interface AlgorithmInfo {
 	description: string;
 }
 
-export type Algorithm = "csp" | "hill_climb" | "stochastic_hc" | "hc_entropy" | "stochastic_hc_entropy" | "sa" | "sa_entropy";
+export type Algorithm =
+	| "csp"
+	| "hill_climb"
+	| "stochastic_hc"
+	| "hc_entropy"
+	| "stochastic_hc_entropy"
+	| "sa"
+	| "sa_entropy"
+	| "ga"
+	| "ga_entropy";
 
 /**
  * Generate a unique session ID

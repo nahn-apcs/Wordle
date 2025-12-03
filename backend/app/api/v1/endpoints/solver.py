@@ -24,6 +24,8 @@ from app.services.algorithms import (
     StochasticHCEntropySolver,
     SASolver,
     SAEntropySolver,
+    GASolver,
+    GAEntropySolver,
 )
 
 router = APIRouter()
@@ -42,6 +44,8 @@ ALGORITHMS = {
     "stochastic_hc_entropy": StochasticHCEntropySolver,
     "sa": SASolver,
     "sa_entropy": SAEntropySolver,
+    "ga": GASolver,
+    "ga_entropy": GAEntropySolver,
 }
 
 

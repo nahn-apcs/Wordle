@@ -384,6 +384,8 @@
 							<option value="stochastic_hc_entropy">Stochastic HC Entropy</option>
 							<option value="sa">Simulated Annealing</option>
 							<option value="sa_entropy">Simulated Annealing Entropy</option>
+							<option value="ga">Genetic Algorithm</option>
+							<option value="ga_entropy">Genetic Algorithm Entropy</option>
 						</select>
 					</div>
 

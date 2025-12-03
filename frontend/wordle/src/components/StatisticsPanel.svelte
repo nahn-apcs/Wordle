@@ -11,6 +11,8 @@
 		{ value: "stochastic_hc_entropy", label: "Stochastic HC Entropy" },
 		{ value: "sa", label: "Simulated Annealing" },
 		{ value: "sa_entropy", label: "Simulated Annealing Entropy" },
+		{ value: "ga", label: "Genetic Algorithm" },
+		{ value: "ga_entropy", label: "Genetic Algorithm Entropy" },
 	];
 
 	let selectedAlgo: Algorithm = "csp";

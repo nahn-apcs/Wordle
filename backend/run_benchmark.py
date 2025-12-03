@@ -37,6 +37,8 @@ from app.services.algorithms import (
     StochasticHCEntropySolver,
     SASolver,
     SAEntropySolver,
+    GASolver,
+    GAEntropySolver,
 )
 
 
@@ -339,15 +341,56 @@ class SAEntropyAlgorithm(BaseAlgorithm):
         self.solver.reset()
 
 
-class GeneticAlgorithm(BaseAlgorithm):
-    """Placeholder for GA - will import from app.services.algorithms.genetic"""
-    name = "genetic"
-    
+class GAHeuristicAlgorithm(BaseAlgorithm):
+    """Wrapper for GASolver (heuristic fitness GA)."""
+    name = "ga"
+
+    def __init__(self, word_manager: WordManager):
+        super().__init__(word_manager)
+        self.solver = GASolver(word_list=word_manager.all_words)
+
     def get_guess(self) -> str:
-        remaining = self.word_manager.remaining_words
-        if not remaining:
-            return "CRANE"
-        return random.choice(remaining)
+        return self.solver.make_prediction()
+
+    def update(self, guess: str, feedback: List[LetterState]):
+        color_map = {
+            LetterState.CORRECT: 'G',
+            LetterState.PRESENT: 'Y', 
+            LetterState.ABSENT: 'B'
+        }
+        colors = ''.join(color_map[f] for f in feedback)
+        self.solver.update_feedback(guess, colors)
+        super().update(guess, feedback)
+
+    def reset(self):
+        super().reset()
+        self.solver.reset()
+
+
+class GAEntropyAlgorithm(BaseAlgorithm):
+    """Wrapper for GAEntropySolver (entropy fitness GA)."""
+    name = "ga_entropy"
+
+    def __init__(self, word_manager: WordManager):
+        super().__init__(word_manager)
+        self.solver = GAEntropySolver(word_list=word_manager.all_words)
+
+    def get_guess(self) -> str:
+        return self.solver.make_prediction()
+
+    def update(self, guess: str, feedback: List[LetterState]):
+        color_map = {
+            LetterState.CORRECT: 'G',
+            LetterState.PRESENT: 'Y', 
+            LetterState.ABSENT: 'B'
+        }
+        colors = ''.join(color_map[f] for f in feedback)
+        self.solver.update_feedback(guess, colors)
+        super().update(guess, feedback)
+
+    def reset(self):
+        super().reset()
+        self.solver.reset()
 
 
 class HCEntropyAlgorithm(BaseAlgorithm):
@@ -410,7 +453,9 @@ ALGORITHMS: Dict[str, type] = {
     "stochastic_hc": StochasticHCAlgorithm,
     "sa": SimulatedAnnealingAlgorithm,
     "sa_entropy": SAEntropyAlgorithm,
-    "genetic": GeneticAlgorithm,
+    "ga": GAHeuristicAlgorithm,
+    "ga_entropy": GAEntropyAlgorithm,
+    "genetic": GAHeuristicAlgorithm,  # backward compatibility alias
     "hc_entropy": HCEntropyAlgorithm,
     "stochastic_hc_entropy": StochasticHCEntropyAlgorithm,
 }
